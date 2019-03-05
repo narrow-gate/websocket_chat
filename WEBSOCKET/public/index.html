@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="name">
+    <button id="setName">设置</button>
+    <!-- 初始是没有上面两行的-->
+    <input type="text"  id="text">
+    <button type="button" id="btn">发送</button>
+<div id="container"></div>
+    <script>
+    /**
+     * var ws=new WebSocket('ws://localhost:2333');//建立一个websocket对象，把服务器地址传进去
+      //ws.send:客户端直接给服务器端推送消息
+     document.getElementById('setName').onclick=function(){
+
+     }
+      ws.onopen=function(){//建立连接
+       document.getElementById('btn').onclick=function(){
+              ws.send(document.getElementById('text').value)   
+       }
+      }
+      ws.onmessage=function(e){
+          console.log(e.data);
+          //document.body.innerHTML+='<p>'+e.data+'</p>'这种方式是因为只创建了一个p，没办法添加新元素，解决方法：
+          var p=document.createElement('p');
+          p.innerHTML=e.data;
+          document.body.appendChild(p);
+      }
+     */    
+    var ws=null;
+    document.getElementById('setName').onclick=function(){
+        var name=document.getElementById('name').value;
+        if(name==='') return console.log('名字为空');
+        ws=new WebSocket("ws://localhost:2333");
+        ws.onopen=function(){
+            ws.send(JSON.stringify({
+                name,
+                type:'setname'
+            }));}
+            document.getElementById('btn').onclick=send;
+            document.getElementById('text').onkeyup=function(e){
+                if(e.keyCode!==13) return ;
+                send();
+            }
+        ws.onmessage=function(e){
+         /**
+          *  var p=document.createElement('p');
+            p.innerHTML=e.data;
+            document.getElementById('container').appendChild(p);
+         
+         var div=document.createElement('div');
+         var data=JSON.parse(e.data);
+         switch(data.type){
+             case 'serverinfo':
+               div.style.color='#00f';
+               div.innerHTML=data.info;
+             break;
+         } */ 
+        var con= document.getElementById('container')
+        con.insertBefore(createChatPanel(JSON.parse(e.data)),con.children[0]);
+        }
+    document.getElementById('setName').setAttribute('disabled',true);
+    }
+    function   createChatPanel(data){
+        var name=data.name;
+        var text=data.text;
+        var div= document.createElement('div');
+        var p1=document.createElement('p');
+        var p2=document.createElement('p');
+        p1.innerHTML=name+''+(new Date()).toString();
+        p2.innerHTML=text;
+        p1.style.color='#00f';
+        p1.style.fontWeight='900'
+        div.appendChild(p1);
+        div.appendChild(p2);
+        return div;
+    }
+    function send(){
+   //  var text=document.getElementById('text').value 拿到的字符串不是dom对象
+   var text=document.getElementById('text')
+                if(text==='') return;
+                ws.send(JSON.stringify({
+               text:text.value,
+               type:"chat"     
+            }));
+            text.value='';
+    }
+      </script>
+</body>
+</html>
