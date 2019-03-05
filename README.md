@@ -1,2 +1,2 @@
 # websocket_chat
-websocket简单学习
+websocket学习，主要做一个全双工通信聊天室
